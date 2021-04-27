@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-
+import { Observable } from 'rxjs';
+import { StocksService } from '../services/stocks.service';
+import { map } from "rxjs/operators"; 
 @Component({
   selector: 'stock-data',
   templateUrl: './stockData.component.html',
@@ -8,10 +9,26 @@ import {HttpClient} from "@angular/common/http";
 })
 export class StockData implements OnInit {
 
-  constructor(private http: HttpClient) {
+  date:string;
+  dates:Observable<Data>;
+  exist: boolean;
+  constructor(private stocks: StocksService) {
   }
 
   ngOnInit() {
+    this.exist = false;
+  }
+
+  getDate(){
+    this.exist = false;
+    this.dates = this.stocks.getStocks(this.date).pipe(
+      map(data =>{
+        if(data){
+          this.exist = data.data.length>0;
+          return data.data;
+        }
+      })
+    )
   }
 }
 
